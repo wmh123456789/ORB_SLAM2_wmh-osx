@@ -28,6 +28,7 @@
 
 #include "ORBmatcher.h"
 
+#include<chrono>
 #include<mutex>
 #include<thread>
 
@@ -81,7 +82,7 @@ void LoopClosing::Run()
         if(CheckFinish())
             break;
 
-        usleep(5000);
+        std::this_thread::sleep_for(std::chrono::microseconds(5000));
     }
 
     SetFinish();
@@ -425,7 +426,7 @@ void LoopClosing::CorrectLoop()
     // Wait until Local Mapping has effectively stopped
     while(!mpLocalMapper->isStopped())
     {
-        usleep(1000);
+        std::this_thread::sleep_for(std::chrono::microseconds(1000));
     }
 
     // Ensure current keyframe is updated
@@ -566,8 +567,6 @@ void LoopClosing::CorrectLoop()
     // Optimize graph
     Optimizer::OptimizeEssentialGraph(mpMap, mpMatchedKF, mpCurrentKF, NonCorrectedSim3, CorrectedSim3, LoopConnections, mbFixScale);
 
-    mpMap->InformNewBigChange();
-
     // Add loop edge
     mpMatchedKF->AddLoopEdge(mpCurrentKF);
     mpCurrentKF->AddLoopEdge(mpMatchedKF);
@@ -580,6 +579,8 @@ void LoopClosing::CorrectLoop()
 
     // Loop closed. Release Local Mapping.
     mpLocalMapper->Release();    
+
+    cout << "Loop Closed!" << endl;
 
     mLastLoopKFid = mpCurrentKF->mnId;   
 }
@@ -627,7 +628,7 @@ void LoopClosing::RequestReset()
         if(!mbResetRequested)
             break;
         }
-        usleep(5000);
+        std::this_thread::sleep_for(std::chrono::microseconds(5000));
     }
 }
 
@@ -667,7 +668,7 @@ void LoopClosing::RunGlobalBundleAdjustment(unsigned long nLoopKF)
 
             while(!mpLocalMapper->isStopped() && !mpLocalMapper->isFinished())
             {
-                usleep(1000);
+                std::this_thread::sleep_for(std::chrono::microseconds(1000));
             }
 
             // Get Map Mutex
@@ -734,9 +735,7 @@ void LoopClosing::RunGlobalBundleAdjustment(unsigned long nLoopKF)
 
                     pMP->SetWorldPos(Rwc*Xc+twc);
                 }
-            }            
-
-            mpMap->InformNewBigChange();
+            }
 
             mpLocalMapper->Release();
 

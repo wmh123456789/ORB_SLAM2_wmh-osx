@@ -1,0 +1,4 @@
+/Users/wmh/work/ORB_SLAM2_wmh/Examples/Monocular/mono_tum.cc:29:9: fatal error: 'opencv2/core/core.hpp' file not found
+#include<opencv2/core/core.hpp>
+        ^
+1 error generated.
